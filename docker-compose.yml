@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mongo
+    container_name: mongodb_mflix
+    restart: always
+    ports:
+      - "27018:27017"
+    networks:
+      - ntwrk
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    build: .
+    container_name: express_mflix
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - ntwrk
+    environment:
+      - MONGO_URI=mongodb://db:27017/mflix
+
+networks:
+  ntwrk:
+
+volumes:
+  mongo_data:
