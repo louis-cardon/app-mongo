@@ -88,6 +88,95 @@ app.get('/filmsWith4Actors', async (req, res) => {
     res.json({ filmsWith4Actors: count });
 });
 
+// 13. Affichez
+// - le nombre de contenus (count),
+// - le nombre total de récompenses (totalAwards),
+// - le nombre moyen de nominations (averageNominations) et le nombre moyen de récompenses (averageAwards) 
+// pour l'ensemble des contenus de la collection movies.
+app.get('/stats', async (req, res) => {
+    try {
+        const result = await Movie.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    count: { $sum: 1 },
+                    totalAwards: { $sum: "$awards.wins" },
+                    averageNominations: { $avg: "$awards.nominations" },
+                    averageAwards: { $avg: "$awards.wins" }
+                }
+            }
+        ]);
+        res.json(result[0]);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 14. Affichez le nombre d'acteurs au casting (castTotal) pour chaque contenu
+app.get('/castTotal', async (req, res) => {
+    try {
+        const result = await Movie.aggregate([
+            {
+                $project: {
+                    title: 1,
+                    castTotal: { $size: { $ifNull: ["$cast", []] } }
+                }
+            }
+        ]);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 15. Calculez le nombre de fois que le terme "Hollywood" apparaît dans le résumé des contenus (cf. attribut fullplot).
+app.get('/hollywoodCount', async (req, res) => {
+    try {
+        const result = await Movie.aggregate([
+            {
+                $match: { fullplot: { $regex: /hollywood/i } }
+            },
+            {
+                $group: {
+                    _id: null,
+                    count: { $sum: { $size: { $split: [{ $toLower: "$fullplot" }, "hollywood"] } } }
+                }
+            }
+        ]);
+        res.json({ hollywoodCount: result.length > 0 ? result[0].count - 1 : 0 });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 16. Trouvez les films sortis entre 2000 et 2010 qui ont une note IMDB supérieure à 8 et plus de 10 récompenses.
+app.get('/topMovies2000-2010', async (req, res) => {
+    try {
+        const movies = await Movie.find({
+            year: { $gte: 2000, $lte: 2010 },
+            "imdb.rating": { $gt: 8 },
+            "awards.wins": { $gt: 10 }
+        }).limit(10);
+        res.json(movies);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 17. Question personnalisée : Nombre de films avec une durée supérieure à 2h et une note IMDB > 7.5
+app.get('/longHighRatedMovies', async (req, res) => {
+    try {
+        const count = await Movie.countDocuments({
+            runtime: { $gte: 120 },
+            "imdb.rating": { $gt: 7.5 }
+        });
+        res.json({ longHighRatedMovies: count });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 app.listen(PORT, () => {
     console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
 });

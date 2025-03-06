@@ -16,6 +16,11 @@
 - [http://localhost:3000/frenchItalianFilms](http://localhost:3000/frenchItalianFilms)
 - [http://localhost:3000/highRatedFilms](http://localhost:3000/highRatedFilms)
 - [http://localhost:3000/filmsWith4Actors](http://localhost:3000/filmsWith4Actors)
+- [http://localhost:3000/stats](http://localhost:3000/stats)
+- [http://localhost:3000/castTotal](http://localhost:3000/castTotal)
+- [http://localhost:3000/hollywoodCount](http://localhost:3000/hollywoodCount)
+- [http://localhost:3000/topMovies2000-2010](http://localhost:3000/topMovies2000-2010)
+- [http://localhost:3000/longHighRatedMovies](http://localhost:3000/longHighRatedMovies)
 
 ## Marche à suivre :
 
